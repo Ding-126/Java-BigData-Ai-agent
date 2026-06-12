@@ -112,17 +112,60 @@ hermes config set <键> <值>
 
 （具体键名以 `hermes config` 帮助或官方文档为准。）
 
-### 4. 门户 / 浏览器登录类配置（若文档支持）
+### 4. 门户 / 浏览器登录类配置（可选，非必须）
 
 ```bash
 hermes setup --portal
 ```
+
+仅在使用 **Nous Portal 订阅** 时需要；使用百炼等 API Key 可跳过。
+
+### 5. 阿里百炼（DashScope）API Key 配置（推荐国内用户）
+
+`hermes model` 是交互式 TUI，在部分终端里可能看起来像「没反应」——光标在等键盘选择。若不想走向导，可直接用命令 + 编辑密钥文件：
+
+**1）写入 API Key**（在 [百炼控制台](https://bailian.console.aliyun.com/) 创建）：
+
+```bash
+nano ~/.hermes/.env
+```
+
+找到并填写（中国大陆节点）：
+
+```bash
+DASHSCOPE_API_KEY=sk-你的百炼密钥
+DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+```
+
+**2）设置模型与 Provider**（已配置可跳过）：
+
+```bash
+hermes config set model.provider alibaba
+hermes config set model.default qwen3.5-plus
+hermes config set model.base_url https://dashscope.aliyuncs.com/compatible-mode/v1
+```
+
+**3）验证**：
+
+```bash
+hermes config show
+hermes doctor
+hermes chat --provider alibaba --model qwen3.5-plus
+```
+
+| 密钥类型 | provider | base_url |
+|----------|----------|----------|
+| 百炼按量付费（国内） | `alibaba` | `https://dashscope.aliyuncs.com/compatible-mode/v1` |
+| 百炼国际站 / 新加坡 | `alibaba` | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` |
+| Coding Plan 订阅 | `alibaba-coding-plan` | `https://coding-intl.dashscope.aliyuncs.com/v1` |
 
 ---
 
 ## 五、Gateway（Telegram / Discord / Slack）
 
 Gateway 让 Hermes 在 IM 里 24/7 响应（需本机或服务器常开，或使用 launchd 后台服务）。
+
+> **Telegram 详细步骤**见 [03-配置绑定Telegram.md](./03-配置绑定Telegram.md)。
 
 ### 1. 初始化与安装
 
@@ -239,5 +282,14 @@ source ~/.zshrc
 - 每月执行一次：`hermes update --check` → `hermes update` → `hermes doctor`
 - Gateway 长期运行时，偶尔查看 `gateway.log` 是否有重复报错
 - 重要 API Key 不要提交到 Git；仅保存在本地配置中
+
+## 十一、核心目录
+- All your files are in ~/.hermes/:
+   Settings:  /Users/dudu/.hermes/config.yaml
+   API Keys:  /Users/dudu/.hermes/.env
+   Data:      /Users/dudu/.hermes/cron/, sessions/, logs/
+   Code:      /Users/dudu/.hermes/hermes-agent
+
+
 
 更多细节请以官方文档为准：https://hermes-agent.nousresearch.com/docs
